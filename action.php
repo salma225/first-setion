@@ -1,81 +1,56 @@
 <?php
-function clean($input){
-  
-    $input = trim($input);
-    $input = stripcslashes($input);
-    $input = htmlspecialchars($input);
-  
-  
-     return $input;
-}
-
-
+require './server.php';
 
 if($_SERVER['REQUEST_METHOD'] == "POST"){
 
-   $name     = clean($_POST['name']);
-   $email    = clean($_POST['email']);
-   $password = $_POST['password'];
-   $address = $_POST['address'];
-   $gender    = clean($_POST['gender']);
-   $linkedln    = clean($_POST['linkedln']);
+    $title        = CleanInputs($_POST['title']);
+    $description  = CleanInputs($_POST['description']);
+    $startdate    = CleanInputs($_POST['startdate']);
+    $enddate      = CleanInputs($_POST['enddate']);
    
+    $errors = [];
 
-   $errorMessages = [];
+    if(!validate($title,1)){
+     $errors['title'] = "Field Required.";
+    }elseif(!validate($title,2)){
+        $errors['title'] = "Invalid String.";  
+    }
 
-   if(empty($name)){
+    if(!validate($description,1)){
+        $errors['description'] = "Field Required.";
+       }elseif(!validate($description,2)){
+           $errors['description'] = "Invalid String.";  
+       }
 
-       $errorMessages['Name'] = "Field Required";
-   }
-
-
-   if(empty($email)){
-
-       $errorMessages['Email'] = "Field Required";
-   }
-
-
-   if(strlen($password) < 6){
-
-       $errorMessages['Password'] = "Length Must be > 5 ch";
-   }
-   if(empty($linkedln)){
-
-    $errorMessages['linkedln'] = "Field Required";
-   }
-   if(empty($gender)){
-
-    $errorMessages['gender'] = "Field Required";
-   }
-   if(strlen($address)!=10){
-
-    $errorMessages['address'] = "Length Must be = 10 ch";
-   }
-
-   if(count($errorMessages) > 0){
-
-      foreach($errorMessages as $key => $value){
-
-          echo '* '.$key.' : '.$value.'<br>';
-      }
-   }
-
-   else{
+       if(!validate($startdate,1)){
+        $errors['startdate'] = "Field Required.";
+       }
    
-        echo 'Valid Data';
-  
-   }
+       if(!validate($enddate,1)){
+           $errors['enddate'] = "Field Required.";
+        }
+
+
+    if(count($errors) > 0){
+
+        foreach($errors as $key => $value)
+        {
+            echo '* '.$key.' : '.$value.'<br>';
+        }
+    }else{
+     
+
+     $sql = "INSERT INTO `list`(`title`, `description`, `startdate`, `enddate`) VALUES ('$title','$description','$startdate','$enddate')";
+
+     $op = mysqli_query($con,$sql);
+
+     if($op){
+         header("location: index.php");
+     }else{
+         echo 'Error in list';
+       }
+    }
+
 }
-
-
-
-
-
-
-
-
-
-
-
 
 ?>
